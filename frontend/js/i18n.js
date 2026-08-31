@@ -5,7 +5,7 @@
 const translations = {
   en: {
     // Brand
-    brand_name: "WAFAR",
+    brand_name: "wafar",
     grid_status: "Grid Status",
     user_name: "Abdalla M.",
     user_location: "Apartment #4",
