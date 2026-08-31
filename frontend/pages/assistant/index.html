@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAFAR - AI Assistant</title>
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+</head>
+<body>
+
+  <div class="sidebar-backdrop"></div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../dashboard/index.html" class="brand-logo-container">
+          <img src="../../assets/images/wafar-logo.png" alt="WAFAR Logo" class="brand-logo-img">
+          <div class="brand-info">
+            <span class="brand-name" data-i18n="brand_name">WAFAR</span>
+            <span class="brand-tagline" data-i18n="brand_tagline">Smart Energy</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title" data-i18n="nav_main">Main Menu</span>
+        
+        <a href="../dashboard/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </span>
+          <span data-i18n="nav_dashboard">Dashboard</span>
+        </a>
+
+        <a href="../devices/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </span>
+          <span data-i18n="nav_devices">Smart Lamp</span>
+          <span class="nav-badge">ON</span>
+        </a>
+
+        <a href="../energy/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </span>
+          <span data-i18n="nav_energy">Energy</span>
+        </a>
+
+        <a href="../points/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </span>
+          <span data-i18n="nav_points">Points</span>
+          <span class="nav-badge">2,840</span>
+        </a>
+
+        <a href="../billing/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          </span>
+          <span data-i18n="nav_billing">Billing</span>
+        </a>
+
+        <a href="../assistant/index.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span data-i18n="nav_assistant">AI Assistant</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="eco-status-widget">
+          <div class="eco-status-header">
+            <span class="eco-status-title" data-i18n="assistant_title">AI Assistant</span>
+            <span class="eco-pulse-dot"></span>
+          </div>
+          <div class="eco-status-value" data-i18n="status_on">Online</div>
+          <div class="eco-status-sub" data-i18n="assistant_status">Online & Monitoring</div>
+        </div>
+
+        <div class="user-profile-mini">
+          <div class="user-avatar">AM</div>
+          <div class="user-details">
+            <div class="user-name" data-i18n="user_name">Abdalla M.</div>
+            <div class="user-role" data-i18n="user_location">Smart Villa #42</div>
+          </div>
+          <a href="../login/index.html" class="logout-icon-btn" title="Sign Out">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <header class="app-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="page-breadcrumb">
+            <a href="../dashboard/index.html" data-i18n="brand_name">WAFAR</a>
+            <span>/</span>
+            <span class="page-breadcrumb-current" data-i18n="nav_assistant">AI Assistant</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="header-time-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="liveTimeDisplay">Loading clock...</span>
+          </div>
+
+          <!-- Language Switcher -->
+          <button class="header-toggle-btn" id="langSwitchBtn" onclick="i18n.toggleLanguage()">عربي</button>
+
+          <!-- Theme Switcher -->
+          <button class="header-toggle-btn theme-toggle-btn">🌙</button>
+
+          <button class="btn btn-secondary btn-sm" onclick="resetChatHistory()">
+            <span data-i18n="btn_clear">Clear Thread</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="page-content">
+        <div class="assistant-shell">
+          <!-- Chat Header Bar -->
+          <div class="chat-header-bar">
+            <div class="chat-identity">
+              <div class="assistant-avatar">⚡</div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary);" data-i18n="assistant_title">WAFAR AI Assistant</h3>
+                  <span class="badge badge-success" style="font-size: 0.65rem;">Online</span>
+                </div>
+                <p style="font-size: 0.76rem; color: var(--text-muted);" data-i18n="assistant_status">Online & Monitoring</p>
+              </div>
+            </div>
+            <span class="badge badge-gold" style="font-size: 0.7rem;">WAFAR AI Copilot</span>
+          </div>
+
+          <!-- Chat Messages Container -->
+          <div class="chat-messages-container" id="chatMessagesContainer">
+            <div class="message-bubble-row assistant">
+              <div class="message-avatar">⚡</div>
+              <div style="display: flex; flex-direction: column;">
+                <div class="message-content" id="assistantWelcomeBubble">
+                  Hello Abdalla! I am your <strong>WAFAR AI Energy Assistant</strong>. Ask me anything about your power usage, saving tips, or your smart lamp.
+                </div>
+                <span class="message-time">Just now</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested Prompt Chips -->
+          <div class="suggested-prompts-bar">
+            <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted);" data-i18n="assistant_suggestions">Suggestions:</span>
+            <button class="prompt-chip" onclick="handlePromptChipClick(this.dataset.prompt)" data-prompt="How much energy did I use today?" data-i18n="sug_1">
+              How much energy did I use today?
+            </button>
+            <button class="prompt-chip" onclick="handlePromptChipClick(this.dataset.prompt)" data-prompt="Smart lamp status?" data-i18n="sug_2">
+              Which device consumes the most?
+            </button>
+            <button class="prompt-chip" onclick="handlePromptChipClick(this.dataset.prompt)" data-prompt="How can I reduce my bill?" data-i18n="sug_3">
+              How can I reduce my bill?
+            </button>
+          </div>
+
+          <!-- Input Area -->
+          <form class="chat-input-area" id="chatInputForm" onsubmit="handleChatSubmit(event)">
+            <div class="chat-input-box">
+              <input type="text" id="userMessageInput" placeholder="Ask WAFAR about your energy usage, savings, or lamp..." data-i18n-placeholder="input_placeholder" autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-full); padding: 10px 18px;">
+              <span data-i18n="btn_send">Send</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/api.js"></script>
+  <script src="../../js/main.js"></script>
+  <script src="../../js/assistant.js"></script>
+</body>
+</html>

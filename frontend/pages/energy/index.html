@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAFAR - Energy Analytics</title>
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>
+    .energy-analytics-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    .energy-chart-box {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-backdrop"></div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../dashboard/index.html" class="brand-logo-container">
+          <img src="../../assets/images/wafar-logo.png" alt="WAFAR Logo" class="brand-logo-img">
+          <span class="brand-name" data-i18n="brand_name">WAFAR</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title" data-i18n="nav_main">Main Menu</span>
+        
+        <a href="../dashboard/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </span>
+          <span data-i18n="nav_dashboard">Dashboard</span>
+        </a>
+
+        <a href="../devices/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
+          <span data-i18n="nav_devices">Apartment & Lamp</span>
+          <span class="nav-badge">ON</span>
+        </a>
+
+        <a href="../energy/index.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </span>
+          <span data-i18n="nav_energy">Energy</span>
+        </a>
+
+        <a href="../points/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </span>
+          <span data-i18n="nav_points">WAFAR Points</span>
+          <span class="nav-badge">80 pts</span>
+        </a>
+
+        <a href="../billing/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          </span>
+          <span data-i18n="nav_billing">Billing</span>
+        </a>
+
+        <a href="../assistant/index.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span data-i18n="nav_assistant">AI Assistant</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-mini">
+          <div class="user-avatar">AM</div>
+          <div class="user-details">
+            <div class="user-name" data-i18n="user_name">Abdalla M.</div>
+            <div class="user-role" data-i18n="user_location">Apartment #4</div>
+          </div>
+          <a href="../login/index.html" class="logout-icon-btn" title="Sign Out">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <header class="app-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="page-breadcrumb">
+            <a href="../dashboard/index.html" data-i18n="brand_name">WAFAR</a>
+            <span>/</span>
+            <span class="page-breadcrumb-current" data-i18n="nav_energy">Energy</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="header-time-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="liveTimeDisplay">Loading clock...</span>
+          </div>
+
+          <!-- Language Switcher -->
+          <button class="header-toggle-btn" id="langSwitchBtn" onclick="i18n.toggleLanguage()">عربي</button>
+
+          <!-- Theme Switcher -->
+          <button class="header-toggle-btn theme-toggle-btn">🌙</button>
+        </div>
+      </header>
+
+      <main class="page-content">
+        <!-- Hero Header -->
+        <div class="page-hero">
+          <div class="page-title-group">
+            <h1 data-i18n="energy_title">Energy Analytics</h1>
+            <p data-i18n="energy_subtitle">Historical usage patterns and daily consumption history.</p>
+          </div>
+          <div class="filter-pills-bar">
+            <button class="filter-pill active" data-i18n="filter_week">This Week</button>
+            <button class="filter-pill" data-i18n="filter_month">This Month</button>
+          </div>
+        </div>
+
+        <!-- 3 Analytics Metric Cards -->
+        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="card metric-card">
+            <div class="metric-header">
+              <span class="metric-label" data-i18n="kpi_today_usage">Today's Consumption</span>
+              <div class="metric-icon-box">⚡</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-value">11.90</span>
+              <span class="metric-unit" data-i18n="unit_kwh">kWh</span>
+            </div>
+            <div class="metric-footer">
+              <span class="trend-pill positive">↓ 0.59 kWh saved</span>
+            </div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-header">
+              <span class="metric-label" data-i18n="energy_total_kwh">Total Usage (Month)</span>
+              <div class="metric-icon-box">📊</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-value">215.4</span>
+              <span class="metric-unit" data-i18n="unit_kwh">kWh</span>
+            </div>
+            <div class="metric-footer">
+              <span class="text-muted">August Cycle</span>
+            </div>
+          </div>
+
+          <div class="card metric-card accent-card">
+            <div class="metric-header">
+              <span class="metric-label" data-i18n="energy_total_cost">Est. Energy Cost</span>
+              <div class="metric-icon-box">💰</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-value">342.50</span>
+              <span class="metric-unit" data-i18n="currency">EGP</span>
+            </div>
+            <div class="metric-footer">
+              <span class="badge badge-gold">-8.00 EGP discount ready</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="energy-analytics-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Daily Energy Trend (kWh)</h2>
+              <span class="badge badge-primary">Past 7 Days</span>
+            </div>
+            <div class="card-body">
+              <div class="energy-chart-box">
+                <canvas id="energyAnalyticsChart" class="chart-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Breakdown Table -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title" data-i18n="energy_log_title">Daily Usage Breakdown</h2>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table class="invoices-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="th_day">Day</th>
+                    <th data-i18n="th_usage">Consumption</th>
+                    <th data-i18n="th_diff">Saved</th>
+                  </tr>
+                </thead>
+                <tbody id="energyTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/api.js"></script>
+  <script src="../../js/main.js"></script>
+  <script src="../../js/energy.js"></script>
+</body>
+</html>
