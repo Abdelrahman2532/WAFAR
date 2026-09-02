@@ -10,11 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-  <!-- Optional Project CSS -->
-  <link rel="stylesheet" href="../../css/main.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-
   <style>
     /* ==========================================================================
        CSS VARIABLES & THEME TOKENS
@@ -99,7 +94,7 @@
       font-family: 'Tajawal', 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
-    /* Reset & Base Overrides */
+    /* Reset & Base */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -107,8 +102,8 @@
     }
 
     body {
-      background-color: var(--bg-app) !important;
-      color: var(--text-main) !important;
+      background-color: var(--bg-app);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       overflow-x: hidden;
@@ -179,26 +174,6 @@
       height: 38px;
       width: auto;
       object-fit: contain;
-    }
-
-    .brand-logo-text {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .brand-logo-text .leaf-accent {
-      color: var(--primary-green);
-      font-size: 22px;
-      margin-left: 2px;
-    }
-
-    [dir="rtl"] .brand-logo-text .leaf-accent {
-      margin-left: 0;
-      margin-right: 2px;
     }
 
     .brand-tagline {
@@ -584,58 +559,6 @@
       align-items: center;
       justify-content: center;
       border: 2px solid var(--bg-app);
-    }
-
-    /* Dropdown Menus */
-    .dropdown-container {
-      position: relative;
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
-      padding: 8px;
-      min-width: 230px;
-      z-index: 200;
-      display: none;
-      animation: fadeIn 0.2s ease;
-    }
-
-    [dir="rtl"] .dropdown-menu {
-      right: auto;
-      left: 0;
-    }
-
-    .dropdown-menu.show {
-      display: block;
-    }
-
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .dropdown-item:hover {
-      background-color: var(--bg-card-subtle);
-      color: var(--text-main);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ==========================================================================
@@ -1470,6 +1393,26 @@
       }
     }
 
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 95;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
     .mobile-menu-btn {
       display: none;
       width: 38px;
@@ -1480,11 +1423,16 @@
       align-items: center;
       justify-content: center;
       color: var(--text-main);
+      cursor: pointer;
+      flex-shrink: 0;
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Backdrop for mobile drawer -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <div class="app-layout">
     
@@ -1520,7 +1468,7 @@
               <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
             </svg>
           </span>
-          <span class="nav-label" data-i18n="nav_devices">Apartment & Lamp</span>
+          <span class="nav-label" data-i18n="nav_apartment">Apartment & Lamp</span>
           <span class="nav-badge badge-on" id="sidebarLampBadge">ON</span>
         </a>
 
@@ -1531,15 +1479,6 @@
             </svg>
           </span>
           <span class="nav-label" data-i18n="nav_energy">Energy</span>
-        </a>
-
-        <a href="../energy/index.html" class="nav-item">
-          <span class="nav-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M18 20V10M12 20V4M6 20v-6"></path>
-            </svg>
-          </span>
-          <span class="nav-label" data-i18n="nav_analytics">Usage Analytics</span>
         </a>
 
         <a href="../points/index.html" class="nav-item">
@@ -1605,7 +1544,7 @@
           <div class="saving-progress-bar">
             <div class="saving-progress-fill" id="savingProgressBar"></div>
           </div>
-          <span class="saving-progress-text">85%</span>
+          <span class="saving-progress-text">78%</span>
         </div>
       </div>
 
@@ -1634,7 +1573,11 @@
           <div class="welcome-group">
             <h1>
               <span data-i18n="welcome_title">Welcome back, Abdalla</span>
-              <span class="welcome-leaf">🌿</span>
+              <span class="welcome-leaf">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-4.4 3.6-8 8-8 1.5 0 3 .2 4.4.6C16.6 3.8 13.5 2 12 2z"/>
+                </svg>
+              </span>
             </h1>
             <p data-i18n="welcome_sub">Here's your energy overview for today</p>
           </div>
@@ -1653,9 +1596,9 @@
             <span id="headerLiveTime">Mon, Aug 31, 04:16 PM</span>
           </div>
 
-          <!-- Language Switcher -->
+          <!-- Language Switcher (Connected to i18n.toggleLanguage) -->
           <div class="dropdown-container">
-            <button class="header-pill-btn" id="langSwitchBtn">
+            <button class="header-pill-btn" id="langSwitchBtn" onclick="i18n.toggleLanguage()">
               <span id="currentLangLabel">عربي</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -1664,7 +1607,7 @@
           </div>
 
           <!-- Theme Toggle -->
-          <button class="header-icon-btn" id="themeToggleBtn" title="Toggle Theme">
+          <button class="header-icon-btn" id="themeToggleBtn" title="Toggle Theme" onclick="toggleAppTheme()">
             <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -1687,30 +1630,6 @@
               </svg>
               <span class="notification-badge">3</span>
             </button>
-
-            <div class="dropdown-menu" id="notifDropdown">
-              <div class="dropdown-item">
-                <span>⚡</span>
-                <div>
-                  <strong>Low Peak Window</strong>
-                  <div style="font-size: 11px; color: var(--text-muted);">Electricity price reduced now</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <span>💡</span>
-                <div>
-                  <strong>Bedroom Lamp</strong>
-                  <div style="font-size: 11px; color: var(--text-muted);">Turned ON at 20:14</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <span>🌟</span>
-                <div>
-                  <strong>+10 WAFAR Points</strong>
-                  <div style="font-size: 11px; color: var(--text-muted);">Reward credited today</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </header>
@@ -1887,9 +1806,9 @@
               <div class="card-header-row">
                 <h2 style="font-size: 15px; font-weight: 800;" data-i18n="breakdown_title">Consumption Breakdown</h2>
                 <select class="select-dropdown" id="breakdownFilterSelect">
-                  <option value="today">Today</option>
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
+                  <option value="today" data-i18n="filter_today">Today</option>
+                  <option value="week" data-i18n="filter_this_week">This Week</option>
+                  <option value="month" data-i18n="filter_this_month">This Month</option>
                 </select>
               </div>
 
@@ -1967,8 +1886,8 @@
               <div class="card-header-row">
                 <h2 style="font-size: 15px; font-weight: 800;" data-i18n="monthly_title">Monthly Comparison</h2>
                 <select class="select-dropdown">
-                  <option>This Month</option>
-                  <option>Last 6 Months</option>
+                  <option data-i18n="filter_this_month">This Month</option>
+                  <option data-i18n="filter_last_6_months">Last 6 Months</option>
                 </select>
               </div>
 
@@ -2025,7 +1944,7 @@
                 <div class="insight-main-text" data-i18n="insight_ai_desc">
                   Your consumption is <strong>8% lower</strong> than last week. Keep it up!
                 </div>
-                <a href="#details" class="insight-link" onclick="showToast('Opening detailed AI energy breakdown...')">
+                <a href="../assistant/index.html" class="insight-link">
                   <span data-i18n="view_details">View Details</span> &rarr;
                 </a>
               </div>
@@ -2139,7 +2058,7 @@
               </div>
 
               <!-- Toggle Button -->
-              <button class="lamp-toggle-btn" id="lampToggleBtn">
+              <button class="lamp-toggle-btn" id="lampToggleBtn" onclick="toggleDashLamp()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
                   <line x1="12" y1="2" x2="12" y2="12"></line>
@@ -2222,123 +2141,13 @@
   <script src="../../js/api.js"></script>
 
   <!-- ========================================================================
-       JAVASCRIPT LOGIC
+       DASHBOARD CONTROLLER
        ======================================================================== -->
   <script>
-    /* Global App State */
+    /* Dashboard State */
     const state = {
       isLampOn: true,
-      isDarkMode: false,
-      currentLang: 'en',
-      chartRange: '24',
-      todayKwh: 11.90,
-      wafarPoints: 80
-    };
-
-    /* Translations Dictionary */
-    const dashboardI18n = {
-      en: {
-        tagline: "Smart Energy. Better Tomorrow.",
-        nav_dashboard: "Dashboard",
-        nav_apartment: "Apartment & Lamp",
-        nav_energy: "Energy",
-        nav_analytics: "Usage Analytics",
-        nav_points: "WAFAR Points",
-        nav_billing: "Billing",
-        nav_assistant: "AI Assistant",
-        saving_title: "You're Saving!",
-        saving_subtitle: "Excellent performance this month",
-        welcome_title: "Welcome back, Abdalla",
-        welcome_sub: "Here's your energy overview for today",
-        kpi_today_title: "Today's Consumption",
-        saved_today: "Saved Today",
-        kpi_avg_title: "Average Daily",
-        kpi_bill_title: "Current Bill",
-        wafar_discount: "↓ 8.00 EGP WAFAR Discount",
-        kpi_points_title: "WAFAR Points",
-        chart_title: "Today's Hourly Usage",
-        chart_sub: "Real-time consumption in kWh vs baseline",
-        legend_actual: "Actual (kWh)",
-        legend_average: "Average",
-        lamp_title: "Bedroom Lamp",
-        lamp_more: "Apartment & Lamp >",
-        lamp_device_name: "Bedroom Smart Lamp",
-        power_draw: "Power Draw:",
-        lamp_btn_off: "Turn Off",
-        lamp_btn_on: "Turn On",
-        breakdown_title: "Consumption Breakdown",
-        cat_lighting: "Lighting",
-        cat_appliances: "Appliances",
-        cat_cooling: "Cooling",
-        cat_others: "Others",
-        monthly_title: "Monthly Comparison",
-        activity_title: "Recent Activity",
-        view_all: "View All",
-        act_lamp: "Bedroom smart lamp turned ON (15W)",
-        act_avg: "Consumption is 5% below average",
-        act_points: "Earned +10 WAFAR points for energy saving",
-        insight_ai_title: "AI Insight",
-        insight_ai_desc: "Your consumption is <strong>8% lower</strong> than last week. Keep it up!",
-        view_details: "View Details",
-        insight_saving_title: "Best Saving Time",
-        insight_saving_desc: "Your lowest usage window",
-        insight_device_title: "Top Consuming Device",
-        device_ac: "Air Conditioner",
-        of_total: "of total usage",
-        insight_bill_title: "Projected Bill",
-        vs_last_month: "vs last month"
-      },
-      ar: {
-        tagline: "طاقة ذكية. لغدٍ أفضل.",
-        nav_dashboard: "لوحة التحكم",
-        nav_apartment: "الشقة والمصباح",
-        nav_energy: "الطاقة",
-        nav_analytics: "تحليلات الاستهلاك",
-        nav_points: "نقاط وفّـر",
-        nav_billing: "الفواتير والمدفوعات",
-        nav_assistant: "المساعد الذكي",
-        saving_title: "أنت توفّر الآن!",
-        saving_subtitle: "أداء ممتاز وترشيد متميز هذا الشهر",
-        welcome_title: "مرحباً بعودتك، عبد الله",
-        welcome_sub: "إليك ملخص استهلاك الطاقة لمنزلك اليوم",
-        kpi_today_title: "استهلاك اليوم",
-        saved_today: "وفرت اليوم",
-        kpi_avg_title: "المعدل اليومي",
-        kpi_bill_title: "الفاتورة الحالية",
-        wafar_discount: "↓ خصم وفّر 8.00 ج.م",
-        kpi_points_title: "نقاط وفّـر",
-        chart_title: "الاستهلاك بالساعة اليوم",
-        chart_sub: "الاستهلاك الفعلي بالكيلوواط/س مقارنة بالمعدل",
-        legend_actual: "الفعلي (kWh)",
-        legend_average: "المعدل الطبيعي",
-        lamp_title: "مصباح غرفة النوم",
-        lamp_more: "الشقة والمصابيح &gt;",
-        lamp_device_name: "مصباح غرفة النوم الذكي",
-        power_draw: "سحب الطاقة:",
-        lamp_btn_off: "إطفاء المصباح",
-        lamp_btn_on: "تشغيل المصباح",
-        breakdown_title: "تفاصيل الاستهلاك",
-        cat_lighting: "الإضاءة",
-        cat_appliances: "الأجهزة المنزلية",
-        cat_cooling: "التكييف والتبريد",
-        cat_others: "أخرى",
-        monthly_title: "مقارنة الأشهر",
-        activity_title: "النشاط الأخير",
-        view_all: "عرض الكل",
-        act_lamp: "تم تشغيل مصباح غرفة النوم الذكي (15 واط)",
-        act_avg: "الاستهلاك أقل بـ 5% من المعدل",
-        act_points: "حصلت على +10 نقاط وفّر لترشيد الاستهلاك",
-        insight_ai_title: "رؤية الذكاء الاصطناعي",
-        insight_ai_desc: "استهلاكك أقل بنسبة <strong>8%</strong> مقارنة بالأسبوع الماضي. استمر!",
-        view_details: "عرض التفاصيل",
-        insight_saving_title: "أفضل وقت للتوفير",
-        insight_saving_desc: "نافذة الاستهلاك الأقل تكلفة",
-        insight_device_title: "الجهاز الأكثر استهلاكاً",
-        device_ac: "مكيف الهواء",
-        of_total: "من إجمالي الاستهلاك",
-        insight_bill_title: "الفاتورة المتوقعة",
-        vs_last_month: "مقارنة بالشهر الماضي"
-      }
+      chartRange: '24'
     };
 
     /* Toast Helper */
@@ -2353,11 +2162,12 @@
       }, 2600);
     }
 
-    /* Live Clock Updater */
+    /* Live Clock */
     function initLiveClock() {
       const el = document.getElementById('headerLiveTime');
       function update() {
         const now = new Date();
+        const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
         const options = {
           weekday: 'short',
           month: 'short',
@@ -2366,141 +2176,57 @@
           minute: '2-digit',
           hour12: true
         };
-        el.textContent = now.toLocaleString(state.currentLang === 'ar' ? 'ar-EG' : 'en-US', options);
+        el.textContent = now.toLocaleString(isAr ? 'ar-EG' : 'en-US', options);
       }
       update();
       setInterval(update, 1000);
     }
 
-    /* Theme Switcher */
-    function initThemeToggle() {
-      const btn = document.getElementById('themeToggleBtn');
-      
-      // Load saved theme
-      const savedTheme = localStorage.getItem('wafar-theme') || (document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
-      if (savedTheme === 'dark') {
-        state.isDarkMode = true;
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-
-      btn.addEventListener('click', () => {
-        state.isDarkMode = !state.isDarkMode;
-        document.documentElement.classList.toggle('dark', state.isDarkMode);
-        document.documentElement.setAttribute('data-theme', state.isDarkMode ? 'dark' : 'light');
-        localStorage.setItem('wafar-theme', state.isDarkMode ? 'dark' : 'light');
-        drawHourlyChart();
-        showToast(state.isDarkMode ? (state.currentLang === 'ar' ? 'تم تفعيل الوضع الليلي 🌙' : 'Dark Mode Enabled 🌙') : (state.currentLang === 'ar' ? 'تم تفعيل الوضع النهاري ☀️' : 'Light Mode Enabled ☀️'));
-      });
+    /* Theme Toggle */
+    function toggleAppTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      localStorage.setItem('wafar-theme', isDark ? 'dark' : 'light');
+      drawHourlyChart();
+      const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
+      showToast(isDark ? (isAr ? 'تم تفعيل الوضع الليلي' : 'Dark Mode Enabled') : (isAr ? 'تم تفعيل الوضع النهاري' : 'Light Mode Enabled'));
     }
 
-    /* Language Switcher */
-    function initLanguageSwitcher() {
-      const btn = document.getElementById('langSwitchBtn');
-      const label = document.getElementById('currentLangLabel');
-
-      btn.addEventListener('click', () => {
-        state.currentLang = state.currentLang === 'en' ? 'ar' : 'en';
-        document.documentElement.lang = state.currentLang;
-        document.documentElement.dir = state.currentLang === 'ar' ? 'rtl' : 'ltr';
-        label.textContent = state.currentLang === 'ar' ? 'English' : 'عربي';
-
-        // Apply translations
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-          const key = el.getAttribute('data-i18n');
-          if (dashboardI18n[state.currentLang] && dashboardI18n[state.currentLang][key]) {
-            el.innerHTML = dashboardI18n[state.currentLang][key];
-          }
-        });
-
-        // Update lamp button label
-        const lampBtnLabel = document.getElementById('lampBtnLabel');
-        lampBtnLabel.textContent = state.isLampOn ? dashboardI18n[state.currentLang].lamp_btn_off : dashboardI18n[state.currentLang].lamp_btn_on;
-
-        drawHourlyChart();
-        showToast(state.currentLang === 'ar' ? 'تم تحويل اللغة إلى العربية' : 'Language switched to English');
-      });
-    }
-
-    /* Lamp Power Toggle */
-    async function initLampControl() {
-      const btn = document.getElementById('lampToggleBtn');
+    /* Lamp Toggle */
+    function toggleDashLamp() {
+      state.isLampOn = !state.isLampOn;
       const card = document.getElementById('lampControlCard');
       const statusChip = document.getElementById('lampStatusChip');
       const sidebarBadge = document.getElementById('sidebarLampBadge');
       const wattsVal = document.getElementById('lampWattsVal');
       const btnLabel = document.getElementById('lampBtnLabel');
+      const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
 
-      // Check API state if available
-      try {
-        if (typeof DevicesAPI !== 'undefined' && DevicesAPI.getLampState) {
-          const apiState = await DevicesAPI.getLampState();
-          state.isLampOn = apiState.state;
-        }
-      } catch (e) {}
-
-      function updateLampUI() {
-        if (state.isLampOn) {
-          card.classList.remove('is-off');
-          statusChip.textContent = 'ON';
-          statusChip.style.backgroundColor = 'var(--primary-green-light)';
-          statusChip.style.color = 'var(--primary-green-dark)';
+      if (state.isLampOn) {
+        card.classList.remove('is-off');
+        statusChip.textContent = 'ON';
+        statusChip.style.backgroundColor = 'var(--primary-green-light)';
+        statusChip.style.color = 'var(--primary-green-dark)';
+        if (sidebarBadge) {
           sidebarBadge.textContent = 'ON';
           sidebarBadge.style.display = 'inline-block';
-          wattsVal.textContent = '15 W';
-          btnLabel.textContent = dashboardI18n[state.currentLang].lamp_btn_off;
-        } else {
-          card.classList.add('is-off');
-          statusChip.textContent = 'OFF';
-          statusChip.style.backgroundColor = 'var(--border-color)';
-          statusChip.style.color = 'var(--text-muted)';
-          sidebarBadge.textContent = 'OFF';
-          wattsVal.textContent = '0 W';
-          btnLabel.textContent = dashboardI18n[state.currentLang].lamp_btn_on;
         }
-      }
-
-      updateLampUI();
-
-      btn.addEventListener('click', async () => {
-        state.isLampOn = !state.isLampOn;
-        updateLampUI();
-        
-        try {
-          if (typeof DevicesAPI !== 'undefined' && DevicesAPI.toggleLamp) {
-            await DevicesAPI.toggleLamp(state.isLampOn);
-          }
-        } catch (e) {}
-
-        showToast(state.isLampOn ? (state.currentLang === 'ar' ? 'تم تشغيل مصباح غرفة النوم (15W)' : 'Bedroom Lamp Turned ON (15W)') : (state.currentLang === 'ar' ? 'تم إطفاء مصباح غرفة النوم' : 'Bedroom Lamp Turned OFF (0W)'), state.isLampOn ? '💡' : '🌑');
-      });
-    }
-
-    /* Notification Bell Dropdown */
-    function initNotificationDropdown() {
-      const bell = document.getElementById('notifBellBtn');
-      const menu = document.getElementById('notifDropdown');
-      bell.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('show');
-      });
-      document.addEventListener('click', () => {
-        menu.classList.remove('show');
-      });
-    }
-
-    /* Mobile Sidebar Toggle */
-    function initMobileSidebar() {
-      const toggle = document.getElementById('mobileToggleBtn');
-      const sidebar = document.getElementById('appSidebar');
-      if (toggle) {
-        toggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-        });
+        wattsVal.textContent = '15 W';
+        btnLabel.textContent = isAr ? 'إطفاء المصباح' : 'Turn Off';
+        showToast(isAr ? 'تم تشغيل مصباح غرفة النوم (15W)' : 'Bedroom Lamp Turned ON (15W)', '✓');
+      } else {
+        card.classList.add('is-off');
+        statusChip.textContent = 'OFF';
+        statusChip.style.backgroundColor = 'var(--border-color)';
+        statusChip.style.color = 'var(--text-muted)';
+        if (sidebarBadge) sidebarBadge.textContent = 'OFF';
+        wattsVal.textContent = '0 W';
+        btnLabel.textContent = isAr ? 'تشغيل المصباح' : 'Turn On';
+        showToast(isAr ? 'تم إطفاء مصباح غرفة النوم' : 'Bedroom Lamp Turned OFF (0W)', '✓');
       }
     }
 
-    /* High-Resolution Interactive Hourly Chart */
+    /* Hourly Chart */
     const chartDataSets = {
       '24': {
         labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '19:00', '22:00'],
@@ -2576,7 +2302,6 @@
         ctx.fillText(val.toFixed(1), padding.left - 8, y);
       });
 
-      // Helper function to calculate (x, y) coords
       function getCoord(index, val) {
         const x = padding.left + (index / (data.labels.length - 1)) * chartW;
         const y = padding.top + chartH - (val / maxVal) * chartH;
@@ -2591,7 +2316,7 @@
         ctx.fillText(label, pt.x, h - 22);
       });
 
-      // 3. Draw Average Baseline (Dashed Line)
+      // 3. Draw Average Baseline
       ctx.beginPath();
       ctx.setLineDash([4, 5]);
       ctx.strokeStyle = dashLineColor;
@@ -2602,12 +2327,11 @@
         else ctx.lineTo(pt.x, pt.y);
       });
       ctx.stroke();
-      ctx.setLineDash([]); // Reset line dash
+      ctx.setLineDash([]);
 
-      // 4. Draw Smooth Spline Curve for Actual Consumption
+      // 4. Draw Smooth Spline
       const points = data.actual.map((val, i) => getCoord(i, val));
 
-      // Gradient Fill
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
       for (let i = 0; i < points.length - 1; i++) {
@@ -2626,7 +2350,7 @@
       ctx.fillStyle = fillGrad;
       ctx.fill();
 
-      // Stroke Curve Line
+      // Stroke Line
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
       for (let i = 0; i < points.length - 1; i++) {
@@ -2642,7 +2366,7 @@
       ctx.stroke();
 
       // 5. Draw Data Dots
-      points.forEach((pt, i) => {
+      points.forEach((pt) => {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
         ctx.fillStyle = greenLine;
@@ -2653,7 +2377,7 @@
         ctx.fill();
       });
 
-      // 6. Draw Interactive / Reference Tooltip at Peak (19:00)
+      // 6. Tooltip at Peak
       const hIdx = data.highlightIndex;
       const hPt = points[hIdx];
       if (hPt) {
@@ -2662,7 +2386,6 @@
         const ttX = Math.min(Math.max(hPt.x - tooltipW / 2, padding.left), w - padding.right - tooltipW);
         const ttY = hPt.y - tooltipH - 12;
 
-        // Rounded Tooltip Box
         ctx.fillStyle = isDark ? '#232f21' : '#ffffff';
         ctx.strokeStyle = isDark ? '#3d4f3b' : '#e0e7db';
         ctx.lineWidth = 1;
@@ -2672,7 +2395,6 @@
         ctx.fill();
         ctx.stroke();
 
-        // Little Tooltip Arrow
         ctx.beginPath();
         ctx.moveTo(hPt.x - 4, ttY + tooltipH);
         ctx.lineTo(hPt.x, ttY + tooltipH + 5);
@@ -2681,7 +2403,6 @@
         ctx.fillStyle = isDark ? '#232f21' : '#ffffff';
         ctx.fill();
 
-        // Tooltip Texts
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = '600 10.5px Plus Jakarta Sans, Tajawal, sans-serif';
@@ -2694,23 +2415,50 @@
       }
     }
 
-    /* Initialize Everything */
+    // Initialize Everything on Load
     document.addEventListener('DOMContentLoaded', () => {
       initLiveClock();
-      initThemeToggle();
-      initLanguageSwitcher();
-      initLampControl();
-      initNotificationDropdown();
-      initMobileSidebar();
-      
+
+      // Theme restore
+      const savedTheme = localStorage.getItem('wafar-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+
       drawHourlyChart();
       window.addEventListener('resize', drawHourlyChart);
+
+      // Listen for language change event from i18n
+      window.addEventListener('wafar:langchange', () => {
+        drawHourlyChart();
+        const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
+        const lampBtnLabel = document.getElementById('lampBtnLabel');
+        if (lampBtnLabel) {
+          lampBtnLabel.textContent = state.isLampOn ? (isAr ? 'إطفاء المصباح' : 'Turn Off') : (isAr ? 'تشغيل المصباح' : 'Turn On');
+        }
+      });
 
       document.getElementById('chartRangeSelect').addEventListener('change', (e) => {
         state.chartRange = e.target.value;
         drawHourlyChart();
-        showToast(state.currentLang === 'ar' ? 'تم تحديث عرض المخطط' : 'Chart View Updated: ' + e.target.value + 'h');
       });
+
+      const mobileToggle = document.getElementById('mobileToggleBtn');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const sidebar = document.getElementById('appSidebar');
+
+      if (mobileToggle && sidebar && backdrop) {
+        mobileToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          backdrop.classList.toggle('active');
+        });
+
+        backdrop.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          backdrop.classList.remove('active');
+        });
+      }
     });
   </script>
 </body>
