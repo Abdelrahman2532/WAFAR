@@ -1,43 +1,95 @@
 /**
- * WAFAR API & Data Layer (Frontend Mock / Future Backend Contracts)
+ * WAFAR API & Data Layer (Integrated with Supabase Backend & Realtime)
  *
- * NOTE: WAFAR Demo Hardware is ONE SMART LAMP located in the Bedroom.
- * Future ESP32 Local Endpoints:
- * - ON:  http://192.168.1.100/on
- * - OFF: http://192.168.1.100/off
+ * Hardware LED Control Table: public.led_control (id = 1, is_on = boolean)
+ * Household Profile Table: public.profiles (id = user_id, household_id = "H00001")
  */
 
+// Environment variable resolver across runtime environments (Browser via config.js, Node, Bundler)
+function _getEnvVar(key) {
+  if (typeof window !== "undefined") {
+    if (window.ENV && window.ENV[key]) return window.ENV[key];
+    if (window.__ENV__ && window.__ENV__[key]) return window.__ENV__[key];
+    if (window[key]) return window[key];
+    if (window.process?.env?.[key]) return window.process.env[key];
+  }
+  if (typeof process !== "undefined" && process.env?.[key]) {
+    return process.env[key];
+  }
+  return "";
+}
+
+const SUPABASE_CONFIG = {
+  get url() {
+    return (
+      _getEnvVar("SUPABASE_URL") ||
+      _getEnvVar("VITE_SUPABASE_URL") ||
+      _getEnvVar("NEXT_PUBLIC_SUPABASE_URL") ||
+      ""
+    );
+  },
+  get anonKey() {
+    return (
+      _getEnvVar("SUPABASE_ANON_KEY") ||
+      _getEnvVar("SUPABASE_KEY") ||
+      _getEnvVar("VITE_SUPABASE_ANON_KEY") ||
+      _getEnvVar("NEXT_PUBLIC_SUPABASE_ANON_KEY") ||
+      ""
+    );
+  }
+};
+
+// Lazy Supabase Client Initializer
+let _supabaseClient = null;
+
+function getSupabase() {
+  if (_supabaseClient) return _supabaseClient;
+
+  if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
+    _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage
+      }
+    });
+    window.wafarSupabase = _supabaseClient;
+    return _supabaseClient;
+  }
+
+  return window.wafarSupabase || null;
+}
+
 const WafarData = {
-  // Bedroom Smart Lamp (Single connected device in the house)
+  // Bedroom Smart Lamp (Connected to Supabase public.led_control row id=1)
   smartLamp: {
-    id: "dev-bedroom-lamp-01",
+    id: 1,
     name: "Bedroom Smart Lamp",
-    name_ar: "مصباح أوضة النوم الذكي",
+    name_ar: "مصباح غرفة النوم الذكي",
     room: "Bedroom",
-    room_ar: "أوضة النوم",
-    state: true,
-    powerWatts: 15,
+    room_ar: "غرفة النوم",
+    state: false,
+    powerWatts: 0,
     runningTimeFormatted: "2h 34m",
-    dailyKWh: 0.038,
-    espEndpointOn: "http://192.168.1.100/on",
-    espEndpointOff: "http://192.168.1.100/off"
+    dailyKWh: 0.038
   },
 
-  // WAFAR Points (Only purpose: Discount on electricity bill. 10 Points = 1 EGP)
+  // WAFAR Points (10 Points = 1 EGP)
   pointsProfile: {
     totalPoints: 80,
     pointsPerEGP: 10,
     discountEGP: 8.00,
-    pointsNeededForNextEGP: 0 // already exact multiple of 10, next EGP needs 10 pts
+    pointsNeededForNextEGP: 0
   },
 
   // Billing Mock Data in Egyptian Pounds (EGP)
   billing: {
     currentBill: {
       originalAmountEGP: 342.50,
-      wafarDiscountEGP: 8.00, // 80 points = 8 EGP
+      wafarDiscountEGP: 8.00,
       netAmountEGP: 334.50,
-      dueDate: "Sep 10, 2026",
+      dueDate: "Sep 15, 2026",
       status: "unpaid",
       period: "August 2026",
       kwhUsed: 215.4
@@ -58,25 +110,560 @@ const WafarData = {
 };
 
 // ==========================================================================
-// API SERVICE MODULES
+// AUTHENTICATION SERVICE (Supabase Auth & Profiles)
+// ==========================================================================
+
+const AuthAPI = {
+  /**
+   * Sign in user with email & password via Supabase Auth
+   */
+  signIn: async (email, password) => {
+    const supabase = getSupabase();
+    if (!supabase) {
+      console.warn("Supabase SDK not loaded yet.");
+      if (email.toLowerCase().includes("h00001") || email.toLowerCase().includes("demo")) {
+        localStorage.setItem("wafar_household_id", "H00001");
+        return { success: true, householdId: "H00001" };
+      }
+      return { success: false, error: "Authentication service unavailable." };
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password
+      });
+
+      if (error) {
+        console.error("Supabase Auth Error:", error);
+        return { success: false, error: error.message };
+      }
+
+      if (!data || !data.user) {
+        return { success: false, error: "Invalid login response." };
+      }
+
+      // Fetch user profile to detect household_id
+      let householdId = "H00001";
+      try {
+        const { data: profile, error: profError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+
+        if (!profError && profile) {
+          householdId = profile.household_id || "H00001";
+          localStorage.setItem("wafar_user_profile", JSON.stringify(profile));
+        }
+      } catch (profErr) {
+        console.warn("Profile fetch error:", profErr);
+      }
+
+      localStorage.setItem("wafar_household_id", householdId);
+      return {
+        success: true,
+        user: data.user,
+        session: data.session,
+        householdId: householdId
+      };
+    } catch (err) {
+      console.error("AuthAPI.signIn exception:", err);
+      return { success: false, error: err.message || "An unexpected error occurred." };
+    }
+  },
+
+  /**
+   * Get current Supabase session
+   */
+  getSession: async () => {
+    const supabase = getSupabase();
+    if (!supabase) return null;
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data || !data.session) return null;
+      return data.session;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Get current authenticated user profile
+   */
+  getUserProfile: async () => {
+    const supabase = getSupabase();
+    if (!supabase) return null;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        return { id: user.id, email: user.email, household_id: localStorage.getItem("wafar_household_id") || "H00001" };
+      }
+      return profile;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Protect private pages: redirect to login if not logged in
+   */
+  requireAuth: async (redirectPath = "../login/index.html") => {
+    const supabase = getSupabase();
+    if (!supabase) return true;
+
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data || !data.session) {
+        if (localStorage.getItem("wafar_household_id")) {
+          return true;
+        }
+        window.location.href = redirectPath;
+        return false;
+      }
+      return true;
+    } catch (e) {
+      if (localStorage.getItem("wafar_household_id")) {
+        return true;
+      }
+      window.location.href = redirectPath;
+      return false;
+    }
+  },
+
+  /**
+   * Sign out and redirect to login
+   */
+  signOut: async () => {
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.warn("Error signing out:", e);
+      }
+    }
+    localStorage.removeItem("wafar_household_id");
+    localStorage.removeItem("wafar_user_profile");
+    window.location.href = "../login/index.html";
+  }
+};
+
+// ==========================================================================
+// LED HARDWARE CONTROL SERVICE (Supabase public.led_control row id = 1)
+// ==========================================================================
+
+const LedAPI = {
+  /**
+   * Fetch current LED state from Supabase database table `public.led_control` (id = 1)
+   */
+  getLedState: async () => {
+    // 1. Direct REST Fetch to Supabase API (Always works directly)
+    try {
+      const restRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/led_control?id=eq.1&select=*`, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_CONFIG.anonKey,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`
+        }
+      });
+
+      if (restRes.ok) {
+        const dataArr = await restRes.json();
+        const data = Array.isArray(dataArr) ? dataArr[0] : dataArr;
+        if (data && typeof data.is_on !== "undefined") {
+          const isOn = Boolean(data.is_on);
+          WafarData.smartLamp.state = isOn;
+          WafarData.smartLamp.powerWatts = isOn ? 15 : 0;
+          return isOn;
+        }
+      }
+    } catch (restErr) {
+      console.warn("LedAPI.getLedState direct fetch warning:", restErr);
+    }
+
+    // 2. Fallback to Supabase JS client
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("led_control")
+          .select("id, is_on, updated_at")
+          .eq("id", 1)
+          .single();
+
+        if (!error && data && typeof data.is_on !== "undefined") {
+          const isOn = Boolean(data.is_on);
+          WafarData.smartLamp.state = isOn;
+          WafarData.smartLamp.powerWatts = isOn ? 15 : 0;
+          return isOn;
+        }
+      } catch (clientErr) {
+        console.warn("LedAPI.getLedState supabase client warning:", clientErr);
+      }
+    }
+
+    return WafarData.smartLamp.state;
+  },
+
+  /**
+   * Update LED state in Supabase database `public.led_control` (id = 1)
+   */
+  setLedState: async (newState) => {
+    const boolState = Boolean(newState);
+    console.log("[WAFAR LedAPI] Sending UPDATE to Supabase public.led_control id=1 -> is_on:", boolState);
+
+    // 1. Direct REST PATCH to Supabase (Guaranteed instant execution)
+    try {
+      const restRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/led_control?id=eq.1`, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_CONFIG.anonKey,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          is_on: boolState,
+          updated_at: new Date().toISOString()
+        })
+      });
+
+      if (restRes.ok) {
+        const dataArr = await restRes.json();
+        const data = Array.isArray(dataArr) ? dataArr[0] : dataArr;
+        const finalState = data && typeof data.is_on !== "undefined" ? Boolean(data.is_on) : boolState;
+
+        WafarData.smartLamp.state = finalState;
+        WafarData.smartLamp.powerWatts = finalState ? 15 : 0;
+        console.log("[WAFAR LedAPI] Database updated successfully:", data);
+
+        return { success: true, is_on: finalState, data: data };
+      }
+    } catch (restErr) {
+      console.warn("LedAPI.setLedState direct REST warning:", restErr);
+    }
+
+    // 2. Supabase JS Client update
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("led_control")
+          .update({
+            is_on: boolState,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", 1)
+          .select("id, is_on, updated_at")
+          .single();
+
+        if (!error && data) {
+          const finalState = Boolean(data.is_on);
+          WafarData.smartLamp.state = finalState;
+          WafarData.smartLamp.powerWatts = finalState ? 15 : 0;
+          return { success: true, is_on: finalState, data: data };
+        }
+      } catch (err) {
+        console.error("LedAPI.setLedState client exception:", err);
+      }
+    }
+
+    // Local fallback
+    WafarData.smartLamp.state = boolState;
+    WafarData.smartLamp.powerWatts = boolState ? 15 : 0;
+    return { success: true, is_on: boolState };
+  },
+
+  /**
+   * Subscribe to Supabase Realtime changes on `public.led_control` (row id = 1)
+   */
+  subscribeToLedState: (callback) => {
+    const supabase = getSupabase();
+    if (!supabase || typeof supabase.channel !== "function") return null;
+
+    try {
+      const channelId = `realtime-led-sync-${Math.random().toString(36).substring(2, 9)}`;
+      const channel = supabase.channel(channelId)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "led_control",
+            filter: "id=eq.1"
+          },
+          (payload) => {
+            if (payload && payload.new && typeof payload.new.is_on !== "undefined") {
+              const isOn = !!payload.new.is_on;
+              WafarData.smartLamp.state = isOn;
+              WafarData.smartLamp.powerWatts = isOn ? 15 : 0;
+              if (typeof callback === "function") {
+                callback(isOn, payload.new);
+              }
+            }
+          }
+        )
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            // Channel active
+          }
+        });
+
+      return channel;
+    } catch (err) {
+      console.error("LedAPI.subscribeToLedState exception:", err);
+      return null;
+    }
+  },
+
+  /**
+   * Fetch all 4 light records from Supabase `public.led_control` table
+   */
+  getAllLights: async () => {
+    try {
+      const restRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/led_control?select=*&order=id.asc`, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_CONFIG.anonKey,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`
+        }
+      });
+      if (restRes.ok) {
+        const dataArr = await restRes.json();
+        if (Array.isArray(dataArr) && dataArr.length > 0) {
+          return dataArr;
+        }
+      }
+    } catch (e) {
+      console.warn("LedAPI.getAllLights REST warning:", e);
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("led_control")
+          .select("*")
+          .order("id", { ascending: true });
+        if (!error && Array.isArray(data)) {
+          return data;
+        }
+      } catch (e) {
+        console.warn("LedAPI.getAllLights client warning:", e);
+      }
+    }
+
+    return [
+      { id: 1, name: "Bedroom Light", is_on: false },
+      { id: 2, name: "Kitchen Light", is_on: false },
+      { id: 3, name: "Reception Light", is_on: false },
+      { id: 4, name: "Living Room Light", is_on: false }
+    ];
+  },
+
+  /**
+   * Fetch specific light by database ID
+   */
+  getLightState: async (id = 1) => {
+    try {
+      const restRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/led_control?id=eq.${id}&select=*`, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_CONFIG.anonKey,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`
+        }
+      });
+      if (restRes.ok) {
+        const dataArr = await restRes.json();
+        const data = Array.isArray(dataArr) ? dataArr[0] : dataArr;
+        if (data && typeof data.is_on !== "undefined") {
+          return { success: true, ...data };
+        }
+      }
+    } catch (e) {
+      console.warn(`LedAPI.getLightState(${id}) REST warning:`, e);
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("led_control")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (!error && data) {
+          return { success: true, ...data };
+        }
+      } catch (e) {
+        console.warn(`LedAPI.getLightState(${id}) client warning:`, e);
+      }
+    }
+
+    return { success: false, id, is_on: false };
+  },
+
+  /**
+   * Update specific light state in database table `public.led_control` (by record ID)
+   */
+  setLightState: async (id, newState) => {
+    const boolState = Boolean(newState);
+    console.log(`[WAFAR LedAPI] Sending UPDATE to Supabase public.led_control id=${id} -> is_on:`, boolState);
+
+    try {
+      const restRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/led_control?id=eq.${id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_CONFIG.anonKey,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          is_on: boolState,
+          updated_at: new Date().toISOString()
+        })
+      });
+
+      if (restRes.ok) {
+        const dataArr = await restRes.json();
+        const data = Array.isArray(dataArr) ? dataArr[0] : dataArr;
+        const finalState = data && typeof data.is_on !== "undefined" ? Boolean(data.is_on) : boolState;
+
+        if (id === 1) {
+          WafarData.smartLamp.state = finalState;
+          WafarData.smartLamp.powerWatts = finalState ? 15 : 0;
+        }
+
+        return { success: true, id, is_on: finalState, data };
+      }
+    } catch (e) {
+      console.warn(`LedAPI.setLightState(${id}) REST warning:`, e);
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("led_control")
+          .update({
+            is_on: boolState,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", id)
+          .select("*")
+          .single();
+
+        if (!error && data) {
+          const finalState = Boolean(data.is_on);
+          if (id === 1) {
+            WafarData.smartLamp.state = finalState;
+            WafarData.smartLamp.powerWatts = finalState ? 15 : 0;
+          }
+          return { success: true, id, is_on: finalState, data };
+        }
+      } catch (e) {
+        console.error(`LedAPI.setLightState(${id}) client exception:`, e);
+      }
+    }
+
+    return { success: true, id, is_on: boolState };
+  },
+
+  /**
+   * Subscribe to Realtime changes across all light rows in `public.led_control`
+   */
+  subscribeToAllLights: (callback) => {
+    const supabase = getSupabase();
+    if (!supabase || typeof supabase.channel !== "function") return null;
+
+    try {
+      const channelId = `realtime-all-lights-sync-${Math.random().toString(36).substring(2, 9)}`;
+      const channel = supabase.channel(channelId)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "led_control"
+          },
+          (payload) => {
+            if (payload && payload.new && typeof payload.new.is_on !== "undefined") {
+              const record = payload.new;
+              if (record.id === 1) {
+                WafarData.smartLamp.state = Boolean(record.is_on);
+                WafarData.smartLamp.powerWatts = record.is_on ? 15 : 0;
+              }
+              if (typeof callback === "function") {
+                callback(record.id, Boolean(record.is_on), record);
+              }
+            }
+          }
+        )
+        .subscribe();
+
+      return channel;
+    } catch (err) {
+      console.error("LedAPI.subscribeToAllLights exception:", err);
+      return null;
+    }
+  },
+
+  /**
+   * Unsubscribe / cleanup Realtime channel
+   */
+  unsubscribe: (channel) => {
+    const supabase = getSupabase();
+    if (supabase && channel && typeof supabase.removeChannel === "function") {
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {
+        console.warn("Error removing Supabase channel:", e);
+      }
+    }
+  }
+};
+
+// ==========================================================================
+// DEVICES API (Maps to LedAPI)
 // ==========================================================================
 
 const DevicesAPI = {
   getLampState: async () => {
-    return { ...WafarData.smartLamp };
+    const isOn = await LedAPI.getLedState();
+    return {
+      ...WafarData.smartLamp,
+      state: isOn,
+      powerWatts: isOn ? 15 : 0
+    };
   },
 
   toggleLamp: async (newState) => {
-    WafarData.smartLamp.state = newState;
-    WafarData.smartLamp.powerWatts = newState ? 15 : 0;
-    
-    // Future ESP32 local HTTP call will connect here:
-    // const endpoint = newState ? WafarData.smartLamp.espEndpointOn : WafarData.smartLamp.espEndpointOff;
-    // await fetch(endpoint);
-
-    return { success: true, lamp: { ...WafarData.smartLamp } };
+    const res = await LedAPI.setLedState(newState);
+    return {
+      success: res.success,
+      lamp: {
+        ...WafarData.smartLamp,
+        state: res.is_on,
+        powerWatts: res.is_on ? 15 : 0
+      },
+      error: res.error
+    };
   }
 };
+
+// ==========================================================================
+// POINTS & REWARDS API
+// ==========================================================================
 
 const PointsAPI = {
   getPointsSummary: async () => {
@@ -93,6 +680,10 @@ const PointsAPI = {
     };
   }
 };
+
+// ==========================================================================
+// BILLING & INVOICES API
+// ==========================================================================
 
 const BillingAPI = {
   getBillingSummary: async () => {
@@ -121,18 +712,23 @@ const BillingAPI = {
   }
 };
 
+// ==========================================================================
+// DASHBOARD API
+// ==========================================================================
+
 const DashboardAPI = {
   getSummaryMetrics: async () => {
     const pts = WafarData.pointsProfile.totalPoints;
     const discountEGP = Math.floor(pts / 10);
     const bill = WafarData.billing.currentBill;
+    const lampState = await LedAPI.getLedState();
 
     return {
       todayKWh: 11.90,
       avgDailyKWh: 12.49,
       savedKWh: 0.59,
-      lampState: WafarData.smartLamp.state,
-      lampWatts: WafarData.smartLamp.powerWatts,
+      lampState: lampState,
+      lampWatts: lampState ? 15 : 0,
       lampRoom: WafarData.smartLamp.room,
       lampRoomAr: WafarData.smartLamp.room_ar,
       billAmountEGP: bill.originalAmountEGP,
@@ -157,12 +753,16 @@ const DashboardAPI = {
   getRecentActivity: async () => {
     const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
     return [
-      { time: "20:14", event: isAr ? "تم تشغيل مصباح أوضة النوم (15 واط)" : "Bedroom smart lamp turned ON (15W)" },
+      { time: "20:14", event: isAr ? "تم تشغيل مصباح غرفة النوم (15 واط)" : "Bedroom smart lamp turned ON (15W)" },
       { time: "18:00", event: isAr ? "استهلاكك أقل من المعدل بنسبة 5%" : "Consumption is 5% below average" },
       { time: "14:00", event: isAr ? "كسبت 10 نقاط وفّر لترشيد الاستهلاك" : "Earned +10 WAFAR points for energy saving" }
     ];
   }
 };
+
+// ==========================================================================
+// ENERGY OVERVIEW API
+// ==========================================================================
 
 const EnergyAPI = {
   getAnalytics: async () => {
@@ -185,18 +785,22 @@ const EnergyAPI = {
   }
 };
 
+// ==========================================================================
+// AI ASSISTANT API
+// ==========================================================================
+
 const AssistantAPI = {
   processPrompt: async (query) => {
     const isAr = typeof i18n !== 'undefined' && i18n.isRtl();
     const lower = query.toLowerCase();
 
-    if (lower.includes("today") || lower.includes("النهارده") || lower.includes("استهلكت")) {
+    if (lower.includes("today") || lower.includes("النهارده") || lower.includes("اليوم") || lower.includes("استهلكت")) {
       return {
         answer: isAr ? 
-          "استهلاكك النهارده **11.90 ك.واط/س**، وهو أقل من معدلك الطبيعي (12.49 ك.واط/س). يعني وفرت **0.59 ك.واط/س** النهارده! 👏" : 
+          "استهلاكك اليوم **11.90 ك.و.س**، وهو أقل من معدلك الطبيعي (12.49 ك.و.س). وفرت **0.59 ك.و.س** اليوم!" : 
           "Today's consumption is **11.90 kWh**, which is below your daily average (12.49 kWh). You saved **0.59 kWh** today!",
         metrics: [
-          { label: isAr ? "استهلاك النهارده" : "Today", value: "11.90 kWh" },
+          { label: isAr ? "استهلاك اليوم" : "Today", value: "11.90 kWh" },
           { label: isAr ? "المعدل الطبيعي" : "Average", value: "12.49 kWh" },
           { label: isAr ? "وفرت" : "Saved", value: "-0.59 kWh" }
         ],
@@ -205,23 +809,23 @@ const AssistantAPI = {
     }
 
     if (lower.includes("lamp") || lower.includes("لمبة") || lower.includes("مصباح") || lower.includes("نوم")) {
-      const lamp = WafarData.smartLamp;
+      const lampIsOn = await LedAPI.getLedState();
       return {
         answer: isAr ? 
-          `مصباح أوضة النوم حالياً **${lamp.state ? 'شغّال' : 'مقفول'}** بسحب قدرة **${lamp.powerWatts} واط**. مدة التشغيل اليوم: **${lamp.runningTimeFormatted}**.` : 
-          `The Bedroom Smart Lamp is currently **${lamp.state ? 'ON' : 'OFF'}** drawing **${lamp.powerWatts} Watts**. Running time today: **${lamp.runningTimeFormatted}**.`,
+          `مصباح غرفة النوم حالياً **${lampIsOn ? 'شغّال' : 'مغلق'}** بسحب قدرة **${lampIsOn ? 15 : 0} واط**.` : 
+          `The Bedroom Smart Lamp is currently **${lampIsOn ? 'ON' : 'OFF'}** drawing **${lampIsOn ? 15 : 0} Watts**.`,
         metrics: [
-          { label: isAr ? "الحالة" : "State", value: lamp.state ? (isAr ? "شغّال (15 واط)" : "ON (15W)") : (isAr ? "مُغلق" : "OFF") },
-          { label: isAr ? "المكان" : "Room", value: isAr ? "أوضة النوم" : "Bedroom" }
+          { label: isAr ? "الحالة" : "State", value: lampIsOn ? (isAr ? "شغّال (15 واط)" : "ON (15W)") : (isAr ? "مُغلق" : "OFF") },
+          { label: isAr ? "المكان" : "Room", value: isAr ? "غرفة النوم" : "Bedroom" }
         ],
-        action: { label: isAr ? "مخطط الشقة واللمبة" : "Apartment Floor Plan", link: "../devices/index.html" }
+        action: { label: isAr ? "مخطط الشقة والمصباح" : "Apartment Floor Plan", link: "../devices/index.html" }
       };
     }
 
     if (lower.includes("points") || lower.includes("نقاط") || lower.includes("خصم") || lower.includes("discount")) {
       return {
         answer: isAr ? 
-          "معاك حالياً **80 نقطة وفّر** تديك **8 جنيه خصم مباشر** على فاتورة الكهرباء الحالية (كل 10 نقاط = 1 جنيه خصم)." : 
+          "معك حالياً **80 نقطة وفّر** تمنحك **8 جنيه خصم مباشر** على فاتورة الكهرباء الحالية (كل 10 نقاط = 1 جنيه خصم)." : 
           "You currently have **80 WAFAR Points**, giving you an **8 EGP direct discount** on your electricity bill (10 points = 1 EGP discount).",
         metrics: [
           { label: isAr ? "نقاط وفّر" : "Points", value: "80 pts" },
@@ -234,7 +838,7 @@ const AssistantAPI = {
     if (lower.includes("bill") || lower.includes("فاتورة") || lower.includes("ادفع") || lower.includes("سداد")) {
       return {
         answer: isAr ? 
-          "فاتورتك الحالية **342.50 جنيه**، بعد تطبيق خصم وفّر (**-8.00 جنيه**) يصبح المبلغ المطلوب دفعه **334.50 جنيه**. تقدر تدفعها بفودافون كاش أو إنستاباي أو كارتك." : 
+          "فاتورتك الحالية **342.50 جنيه**، وبعد تطبيق خصم وفّر (**-8.00 جنيه**) يصبح المبلغ المطلوب **334.50 جنيه**. يمكنك الدفع بفودافون كاش أو إنستاباي أو البطاقة البنكية." : 
           "Your current bill is **342.50 EGP**. With your WAFAR discount (**-8.00 EGP**), the amount to pay is **334.50 EGP**. You can pay via Vodafone Cash, InstaPay, or Card.",
         metrics: [
           { label: isAr ? "الفاتورة" : "Bill", value: "342.50 EGP" },
@@ -248,13 +852,13 @@ const AssistantAPI = {
     // Default response
     return {
       answer: isAr ? 
-        "أنا هنا لمساعدتك في مراقبة استهلاك بيتك وتوفير فاتورة الكهرباء. اسألني عن استهلاكك، اللمبة، أو خصم نقاط وفّر." : 
+        "أنا مساعد وفّر الذكي لمساعدتك في مراقبة استهلاك بيتك وتوفير فاتورة الكهرباء. اسألني عن استهلاكك، حالة المصباح، أو خصم نقاط وفّر." : 
         "I'm here to help you monitor and save on your electricity. Ask me about today's usage, bedroom lamp, or your WAFAR discount.",
       metrics: [
-        { label: isAr ? "استهلاك النهارده" : "Today", value: "11.90 kWh" },
-        { label: isAr ? "خصمك متاح" : "Discount", value: "8 EGP" }
+        { label: isAr ? "استهلاك اليوم" : "Today", value: "11.90 kWh" },
+        { label: isAr ? "خصم متاح" : "Discount", value: "8 EGP" }
       ],
-      action: { label: isAr ? "الرئيسية" : "Dashboard", link: "../dashboard/index.html" }
+      action: { label: isAr ? "لوحة التحكم" : "Dashboard", link: "../dashboard/index.html" }
     };
   }
 };

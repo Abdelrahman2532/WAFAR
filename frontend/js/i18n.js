@@ -320,7 +320,7 @@ const translations = {
     legend_actual: "الفعلي (kWh)",
     legend_average: "المعدل الطبيعي",
     lamp_title: "مصباح غرفة النوم",
-    lamp_more: "الشقة والمصابيح &gt;",
+    lamp_more: "الشقة والمصابيح >",
     lamp_device_name: "مصباح غرفة النوم الذكي",
     power_draw: "سحب الطاقة:",
     lamp_btn_off: "إطفاء المصباح",
