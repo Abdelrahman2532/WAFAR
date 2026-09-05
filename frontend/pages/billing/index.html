@@ -1,277 +1,420 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WAFAR - Billing & Payments</title>
-  <link rel="stylesheet" href="../../css/main.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-  <style>
-    .billing-main-grid {
-      display: grid;
-      grid-template-columns: 1.6fr 1.4fr;
-      gap: 24px;
-    }
-  </style>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="billing.css">
 </head>
+
 <body>
 
-  <div class="sidebar-backdrop"></div>
+  <!-- Backdrop for mobile drawer -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-  <div class="app-container">
-    <!-- Sidebar -->
-    <aside class="app-sidebar">
-      <div class="sidebar-header">
-        <a href="../dashboard/index.html" class="brand-logo-container">
-          <img src="../../assets/images/wafar-logo.png" alt="WAFAR Logo" class="brand-logo-img">
-          <span class="brand-name" data-i18n="brand_name">WAFAR</span>
+  <div class="app-layout">
+    
+    <!-- ========================================================================
+         SIDEBAR
+         ======================================================================== -->
+    <aside class="sidebar" id="appSidebar">
+      <!-- Brand Logo -->
+      <div class="sidebar-brand">
+        <a href="../dashboard/index.html" class="brand-logo-link">
+          <img src="../../assets/images/WAFAR-LOGO .png" alt="WAFAR Logo" class="brand-logo-img" onerror="this.src='../../assets/images/WAFAR-LOGO.jpeg'">
         </a>
+        <span class="brand-tagline" data-i18n="tagline">Smart Energy. Better Tomorrow.</span>
       </div>
 
-      <nav class="sidebar-nav">
-        <span class="nav-section-title" data-i18n="nav_main">Main Menu</span>
-        
+      <!-- Navigation Menu -->
+      <nav class="nav-menu">
         <a href="../dashboard/index.html" class="nav-item">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
           </span>
-          <span data-i18n="nav_dashboard">Dashboard</span>
+          <span class="nav-label" data-i18n="nav_dashboard">Dashboard</span>
         </a>
 
         <a href="../devices/index.html" class="nav-item">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
           </span>
-          <span data-i18n="nav_devices">Apartment & Lamp</span>
-          <span class="nav-badge">ON</span>
+          <span class="nav-label" data-i18n="nav_apartment">Apartment & Lamp</span>
+          <span class="nav-badge badge-on" id="sidebarLampBadge">ON</span>
         </a>
 
         <a href="../energy/index.html" class="nav-item">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
           </span>
-          <span data-i18n="nav_energy">Energy</span>
+          <span class="nav-label" data-i18n="nav_energy">Energy</span>
         </a>
 
         <a href="../points/index.html" class="nav-item">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
           </span>
-          <span data-i18n="nav_points">WAFAR Points</span>
-          <span class="nav-badge">80 pts</span>
+          <span class="nav-label" data-i18n="nav_points">WAFAR Points</span>
+          <span class="nav-badge badge-points">80 pts</span>
         </a>
 
         <a href="../billing/index.html" class="nav-item active">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
           </span>
-          <span data-i18n="nav_billing">Billing</span>
+          <span class="nav-label" data-i18n="nav_billing">Billing</span>
         </a>
 
         <a href="../assistant/index.html" class="nav-item">
           <span class="nav-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
           </span>
-          <span data-i18n="nav_assistant">AI Assistant</span>
+          <span class="nav-label" data-i18n="nav_assistant">AI Assistant</span>
         </a>
       </nav>
 
-      <div class="sidebar-footer">
-        <div class="user-profile-mini">
-          <div class="user-avatar">AM</div>
-          <div class="user-details">
-            <div class="user-name" data-i18n="user_name">Abdalla M.</div>
-            <div class="user-role" data-i18n="user_location">Apartment #4</div>
-          </div>
-          <a href="../login/index.html" class="logout-icon-btn" title="Sign Out">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          </a>
+      <!-- Sidebar User Profile -->
+      <div class="sidebar-user">
+        <div class="user-avatar">AM</div>
+        <div class="user-info">
+          <div class="user-name" data-i18n="user_name">Abdalla M.</div>
+          <div class="user-apt" data-i18n="user_location">Apartment #4</div>
         </div>
+        <a href="#" class="user-menu-btn" title="Sign Out" onclick="AuthAPI.signOut(); return false;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="app-main">
-      <header class="app-header">
-        <div class="header-left">
-          <button class="mobile-menu-toggle" aria-label="Toggle menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    <!-- ========================================================================
+         MAIN CONTENT WRAPPER
+         ======================================================================== -->
+    <main class="main-wrapper">
+      
+      <!-- Top Breadcrumb -->
+      <div class="breadcrumb-bar">
+        <a href="../dashboard/index.html">WAFAR</a>
+        <span>/</span>
+        <span class="breadcrumb-current" data-i18n="nav_billing">Billing</span>
+      </div>
+
+      <!-- Top Header with Actions -->
+      <header class="top-header">
+        <div class="header-title-row">
+          <button class="mobile-menu-btn" id="mobileToggleBtn" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
-          <div class="page-breadcrumb">
-            <a href="../dashboard/index.html" data-i18n="brand_name">WAFAR</a>
-            <span>/</span>
-            <span class="page-breadcrumb-current" data-i18n="nav_billing">Billing</span>
+          
+          <div class="welcome-group">
+            <h1 data-i18n="billing_page_title">Billing</h1>
+            <p data-i18n="billing_page_sub">Manage your bill, choose payment method and view invoices history.</p>
           </div>
         </div>
 
-        <div class="header-right">
-          <div class="header-time-pill">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            <span id="liveTimeDisplay">Loading clock...</span>
+        <!-- Header Controls -->
+        <div class="header-actions">
+          <!-- Live Date & Time -->
+          <div class="header-pill-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="headerLiveTime">Tue, Sep 1, 11:37 PM</span>
           </div>
 
           <!-- Language Switcher -->
-          <button class="header-toggle-btn" id="langSwitchBtn" onclick="i18n.toggleLanguage()">عربي</button>
+          <div class="dropdown-container">
+            <button class="header-pill-btn" id="langSwitchBtn" onclick="i18n.toggleLanguage()">
+              <span id="currentLangLabel">عربي</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
 
-          <!-- Theme Switcher -->
-          <button class="header-toggle-btn theme-toggle-btn">🌙</button>
+          <!-- Theme Toggle -->
+          <button class="header-icon-btn" id="themeToggleBtn" title="Toggle Theme" onclick="toggleAppTheme()">
+            <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
         </div>
       </header>
 
-      <main class="page-content">
-        <!-- Hero Header -->
-        <div class="page-hero">
-          <div class="page-title-group">
-            <h1 data-i18n="billing_title">Billing & Payments</h1>
-            <p data-i18n="billing_subtitle">Electricity bill summary with applied WAFAR points discount.</p>
-          </div>
-        </div>
-
-        <div class="billing-main-grid">
-          <!-- Left Column: Bill Breakdown with Points Discount -->
-          <div style="display: flex; flex-direction: column; gap: 20px;">
-            <div class="bill-breakdown-card">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <span class="badge badge-gold" id="billStatusBadge" data-i18n="bill_status_due">Due Soon</span>
-                <span style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="bill_due_date">Due Date: Sep 10, 2026</span>
+      <!-- ====================================================================
+           MAIN BILLING 2-COLUMN GRID
+           ==================================================================== -->
+      <div class="billing-main-grid">
+        
+        <!-- LEFT COLUMN: BILL OVERVIEW & INVOICES HISTORY -->
+        <div class="billing-left-col">
+          
+          <!-- Top Card: Bill Overview -->
+          <section class="card bill-overview-card">
+            <div class="card-header-row">
+              <div class="card-header-title">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h2 data-i18n="bill_overview_title">Bill Overview</h2>
               </div>
 
-              <!-- Breakdown Rows -->
-              <div class="bill-row-item">
-                <span data-i18n="bill_original_amount">Electricity Bill</span>
-                <strong id="origBillDisplay">342.50 EGP</strong>
+              <div class="due-date-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span data-i18n="bill_due_date_label">Due: Sep 15, 2026</span>
               </div>
+            </div>
 
-              <div class="bill-row-item discount-row">
-                <span data-i18n="bill_discount_applied">WAFAR Points Discount (80 pts)</span>
-                <strong id="wafarDiscountDisplay">-8.00 EGP</strong>
-              </div>
+            <div class="bill-overview-body">
+              <!-- Left stats -->
+              <div class="bill-stats-side">
+                <div class="bill-stat-row">
+                  <span class="bill-stat-label" data-i18n="bill_original_amount">Bill Original Amount</span>
+                  <strong class="bill-stat-val">342.50 EGP</strong>
+                </div>
 
-              <div class="bill-row-item total-pay-row">
-                <span data-i18n="bill_net_to_pay">Amount to Pay</span>
-                <span style="color: var(--primary); font-size: 1.7rem;" id="netToPayDisplay">334.50 EGP</span>
-              </div>
+                <div class="bill-stat-row">
+                  <span class="bill-stat-label" data-i18n="discount_applied">Discount Applied</span>
+                  <strong class="bill-stat-val discount-green">-8.00 EGP</strong>
+                </div>
 
-              <div style="margin-top: 20px;">
-                <button class="btn btn-primary btn-lg" id="payBillMainBtn" style="width: 100%;" onclick="openPaymentModal()">
-                  <span data-i18n="btn_pay_bill">Pay Bill Now</span> &rarr;
+                <div class="total-amount-block">
+                  <span class="total-amount-label" data-i18n="total_amount_label">Total Amount</span>
+                  <div class="total-amount-val">334.50 EGP</div>
+                </div>
+
+                <button class="btn-pay-my-bill" onclick="handlePayBill()">
+                  <span data-i18n="btn_pay_my_bill">Pay My Bill</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
                 </button>
               </div>
-            </div>
 
-            <!-- Invoices Table -->
-            <div class="card">
-              <div class="card-header">
-                <h2 class="card-title" data-i18n="invoices_history_title">Previous Invoices</h2>
-              </div>
-              <div class="card-body" style="padding: 0;">
-                <table class="invoices-table">
-                  <thead>
-                    <tr>
-                      <th data-i18n="th_invoice_num">Invoice</th>
-                      <th data-i18n="th_month">Month</th>
-                      <th data-i18n="th_kwh">Usage</th>
-                      <th data-i18n="th_net_amount">Paid Amount</th>
-                      <th data-i18n="th_status">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="invoicesTbody">
-                    <!-- Rendered dynamically by billing.js -->
-                  </tbody>
-                </table>
+              <!-- Right 3D Visual -->
+              <div class="bill-visual-wrap">
+                <img src="../../assets/images/billing-apartment.png" alt="3D Apartment View" class="billing-apartment-img" onerror="this.src='../../assets/images/apartment-3d.png'">
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- Right Column: Select Payment Method -->
-          <div>
-            <div class="card">
-              <div class="card-header">
-                <h2 class="card-title" data-i18n="select_payment_method">Select Payment Method</h2>
-              </div>
-              <div class="card-body">
-                <div class="payment-methods-grid" style="grid-template-columns: 1fr;">
-                  <!-- Vodafone Cash -->
-                  <div class="payment-method-card selected" data-method="vodafone" onclick="selectPaymentMethod('vodafone', this)">
-                    <div style="font-size: 1.4rem;">📱</div>
-                    <div style="flex: 1; text-align: start;">
-                      <strong style="font-size: 0.92rem;" data-i18n="method_vodafone">Vodafone Cash</strong>
-                      <div style="font-size: 0.74rem; color: var(--text-muted);">010XXXXXXXX</div>
-                    </div>
-                  </div>
-
-                  <!-- InstaPay -->
-                  <div class="payment-method-card" data-method="instapay" onclick="selectPaymentMethod('instapay', this)">
-                    <div style="font-size: 1.4rem;">⚡</div>
-                    <div style="flex: 1; text-align: start;">
-                      <strong style="font-size: 0.92rem;" data-i18n="method_instapay">InstaPay</strong>
-                      <div style="font-size: 0.74rem; color: var(--text-muted);">IPA / Bank Transfer</div>
-                    </div>
-                  </div>
-
-                  <!-- Card -->
-                  <div class="payment-method-card" data-method="card" onclick="selectPaymentMethod('card', this)">
-                    <div style="font-size: 1.4rem;">💳</div>
-                    <div style="flex: 1; text-align: start;">
-                      <strong style="font-size: 0.92rem;" data-i18n="method_card">Debit / Credit Card</strong>
-                      <div style="font-size: 0.74rem; color: var(--text-muted);">Visa / Mastercard</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="padding: 12px; background: var(--bg-app); border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; border: 1px solid var(--border);">
-                  💡 <strong>10 WAFAR Points = 1 EGP discount</strong> automatically deducted from your electricity bill.
-                </div>
+          <!-- Bottom Card: Invoices History -->
+          <section class="card invoices-card">
+            <div class="card-header-row" style="margin-bottom: 8px;">
+              <div class="card-header-title">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <h2 data-i18n="invoices_history_title">Invoices History</h2>
               </div>
             </div>
-          </div>
+
+            <div class="invoices-table-wrap">
+              <table class="invoices-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="th_invoice_no">Invoice No.</th>
+                    <th data-i18n="th_month">Month</th>
+                    <th data-i18n="th_consumption">Consumption</th>
+                    <th data-i18n="th_net_amount">Net Amount</th>
+                    <th data-i18n="th_status">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="inv-id-cell">INV-EGY-08</td>
+                    <td>Aug 2026</td>
+                    <td>215.4 kWh</td>
+                    <td class="inv-amount-cell">334.50 EGP</td>
+                    <td><span class="badge-status badge-due" data-i18n="status_due_soon">Due Soon</span></td>
+                  </tr>
+                  <tr>
+                    <td class="inv-id-cell">INV-EGY-07</td>
+                    <td>Jul 2026</td>
+                    <td>248 kWh</td>
+                    <td class="inv-amount-cell">375.00 EGP</td>
+                    <td><span class="badge-status badge-paid" data-i18n="status_paid">Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td class="inv-id-cell">INV-EGY-06</td>
+                    <td>Jun 2026</td>
+                    <td>260.5 kWh</td>
+                    <td class="inv-amount-cell">395.20 EGP</td>
+                    <td><span class="badge-status badge-paid" data-i18n="status_paid">Paid</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-footer-btn-wrap">
+              <button class="btn-view-all-invoices" onclick="showToast('Loading full invoice archive...')">
+                <span data-i18n="btn_view_all_invoices">View All Invoices</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </section>
+
         </div>
-      </main>
-    </div>
+
+        <!-- RIGHT COLUMN: PAYMENT METHODS & NOTES -->
+        <div class="billing-right-col">
+          
+          <section class="card payment-method-card-box">
+            <div class="card-header-row">
+              <div class="card-header-title">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <h2 data-i18n="select_payment_method">Select Payment Method</h2>
+              </div>
+            </div>
+
+            <div class="payment-methods-stack">
+              
+              <!-- 1. Vodafone Cash (Selected by default) -->
+              <div class="method-card selected" onclick="selectPaymentMethod('vodafone', this)">
+                <div class="method-logo-box logo-vodafone">
+                  <span>vodafone</span>
+                </div>
+                <div class="method-info-text">
+                  <strong data-i18n="method_vodafone_cash">Vodafone Cash</strong>
+                  <span class="method-sub">010 XXXXXXXX</span>
+                </div>
+                <div class="method-check-circle checked">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 2. Instapay -->
+              <div class="method-card" onclick="selectPaymentMethod('instapay', this)">
+                <div class="method-logo-box logo-instapay">
+                  <span>INSTA<br>PAY</span>
+                </div>
+                <div class="method-info-text">
+                  <strong data-i18n="method_instapay">Instapay</strong>
+                  <span class="method-sub" data-i18n="sub_instapay">IPA / Bank Transfer</span>
+                </div>
+                <div class="method-check-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 3. Credit / Debit Card -->
+              <div class="method-card" onclick="selectPaymentMethod('card', this)">
+                <div class="method-logo-box logo-card-brands">
+                  <!-- Visa / Mastercard SVGs -->
+                  <svg width="34" height="20" viewBox="0 0 36 24" fill="none">
+                    <circle cx="13" cy="12" r="8" fill="#EB001B"/>
+                    <circle cx="23" cy="12" r="8" fill="#F79E1B" fill-opacity="0.8"/>
+                  </svg>
+                </div>
+                <div class="method-info-text">
+                  <strong data-i18n="method_card">Credit / Debit Card</strong>
+                  <span class="method-sub" data-i18n="sub_card">Visa / Mastercard</span>
+                </div>
+                <div class="method-check-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 10 WAFAR Points Notice Box -->
+            <div class="discount-notice-card">
+              <div class="discount-bulb-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.5 1.3 4.7 3.2 6h7.6c1.9-1.3 3.2-3.5 3.2-6a7 7 0 0 0-7-7z"></path>
+                </svg>
+              </div>
+              <div class="discount-notice-content">
+                <strong class="discount-note-title" data-i18n="points_discount_note_title">10 WAFAR Points = 1 EGP discount</strong>
+                <p class="discount-note-sub" data-i18n="points_discount_note_sub">Automatically deducted from your electricity bill.</p>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
   </div>
 
-  <!-- Pay Modal -->
-  <div class="modal-backdrop" id="paymentModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3 data-i18n="btn_pay_bill">Pay Bill Now</h3>
-        <button class="btn-icon btn-sm" data-close-modal title="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div style="background: var(--bg-app); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
-            <span style="color: var(--text-secondary);" data-i18n="bill_original_amount">Electricity Bill:</span>
-            <span>342.50 EGP</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--primary-dark); font-weight: 700; margin-bottom: 6px;">
-            <span data-i18n="bill_discount_applied">WAFAR Discount:</span>
-            <span>-8.00 EGP</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800; border-top: 1px solid var(--border); padding-top: 6px;">
-            <span data-i18n="bill_net_to_pay">Amount to Pay:</span>
-            <span style="color: var(--primary);">334.50 EGP</span>
-          </div>
-        </div>
-
-        <div id="paymentFieldsArea">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close-modal data-i18n="btn_cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="confirmPaymentSubmit()" data-i18n="btn_confirm">Confirm Payment</button>
-      </div>
-    </div>
+  <!-- Toast Notification -->
+  <div class="toast-popup" id="appToast">
+    <span id="toastIcon">✓</span>
+    <span id="toastMsg">Action completed</span>
   </div>
 
-  <div class="toast-container"></div>
-
+  <!-- Project Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/config.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/api.js"></script>
-  <script src="../../js/main.js"></script>
-  <script src="../../js/billing.js"></script>
+
+  <!-- Billing Controller -->
+  <script src="billing.js"></script>
 </body>
 </html>
