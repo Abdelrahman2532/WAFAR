@@ -1,4 +1,5 @@
 import os
+import time
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -36,7 +37,6 @@ Today's data for this household:
 
 
 def ask_ai(context, question):
-
     prompt = f"""
 {context}
 
@@ -51,17 +51,25 @@ If the question is in English, reply in English.
 Keep the answer clear, friendly, and concise.
 """
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=prompt
-        )
-        return response.text
+    max_retries = 3
 
-    except Exception as e:
-        print(f"AI connection error: {e}")
-        return "عذرًا، حصلت مشكلة في الاتصال بالمساعد الذكي حاليًا. حاول تاني بعد شوية."
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt
+            )
+            return response.text
 
+        except Exception as e:
+            print(f"AI connection error (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)
+            else:
+                return "عذرًا، حصلت مشكلة في الاتصال بالمساعد الذكي حاليًا. حاول تاني بعد شوية."
+
+
+            
 
 def build_household_context(household_id):
 
